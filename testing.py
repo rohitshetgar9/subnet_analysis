@@ -14,43 +14,24 @@ parser.add_argument("--file", required=True)
 parser.add_argument("--analysis", default=False)
 args = parser.parse_args()
 
-df = pd.DataFrame(columns=["machineid", "ip_addr", "security", "sub_net"])
 COUNT_SUBNET = None
 COUNT_SECURITY = None
 SUBNET_SECURITY = None
 
 
 def main(file):
-    global df,  COUNT_SUBNET, COUNT_SECURITY, SUBNET_SECURITY
+    global COUNT_SUBNET, COUNT_SECURITY, SUBNET_SECURITY
+    
+    # Read the first line of the file to get column names
     with open(file, "r", encoding="utf-8") as f:
-        r = f.readlines()
+        columns = f.readline().strip().split("|")
 
-    for i in r:
-        i = i.split("|")
-        if "machineid" in i:
-            continue
-        machineid = i[0]
-        ip_addr = i[1]
-        security_group = i[2].split(",")
-        if "\n" not in i[3]:
-            subnet = i[3]
-        else:
-            subnet = i[3][:-1]
-
-        for security in security_group:
-            for sub_net in subnet.split(","):
-                dict1 = {
-                    "machineid": machineid,
-                    "ip_addr": ip_addr,
-                    "security": security,
-                    "sub_net": sub_net,
-                }
-                df1 = pd.DataFrame([dict1])
-                df = pd.concat([df, df1], ignore_index=True)
-
+    # Read the rest of the file and create a DataFrame
+    df = pd.read_csv(file, sep="|", skiprows=1, names=columns, skipinitialspace=True)
+   
     COUNT_SUBNET = df["sub_net"].value_counts()
     COUNT_SECURITY = df["security"].value_counts()
-    SUBNET_SECURITY = df.groupby(["sub_net", "security"]).value_counts()
+    SUBNET_SECURITY = df.groupby(["sub_net", "security"])size().reset_index(name="count")
     print("Dataframe format : \n")
     return df
 
