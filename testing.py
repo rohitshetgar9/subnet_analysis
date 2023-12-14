@@ -29,9 +29,9 @@ def main(file):
     # Read the rest of the file and create a DataFrame
     df = pd.read_csv(file, sep="|", skiprows=1, names=columns, skipinitialspace=True)
    
-    COUNT_SUBNET = df["sub_net"].value_counts()
-    COUNT_SECURITY = df["security"].value_counts()
-    SUBNET_SECURITY = df.groupby(["sub_net", "security"])size().reset_index(name="count")
+    COUNT_SUBNET = df["subnet"].value_counts()
+    COUNT_SECURITY = df["security-group"].value_counts()
+    SUBNET_SECURITY = df.groupby(["subnet", "security-group"]).size().reset_index(name="count")
     print("Dataframe format : \n")
     return df
 
